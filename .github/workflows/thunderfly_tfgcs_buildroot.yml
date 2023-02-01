@@ -18,7 +18,7 @@ jobs:
           mercurial subversion
 
       - name: Checkout Buildroot sources
-        run: git clone --depth=1 -b tfgcs git@github.com:ThunderFly-aerospace/TF-buildroot.git
+        run: git clone --depth=1 -b tfgcs https://github.com/ThunderFly-aerospace/TF-buildroot.git
 
       - name: Seeed buildroot cache
         uses: actions/cache@v2
