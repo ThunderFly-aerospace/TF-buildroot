@@ -1,0 +1,4 @@
+config BR2_PACKAGE_MAVLINK_ROUTER
+    bool "mavlink-router"
+    help
+        Mavlink-router package.
