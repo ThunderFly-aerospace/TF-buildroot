@@ -19,7 +19,7 @@
 # - Diff sysusers.d with the previous version
 # - Diff factory/etc/nsswitch.conf with the previous version
 #   (details are often sprinkled around in README and manpages)
-SYSTEMD_VERSION = 250.4
+SYSTEMD_VERSION = 250.8
 SYSTEMD_SITE = $(call github,systemd,systemd-stable,v$(SYSTEMD_VERSION))
 SYSTEMD_LICENSE = \
 	LGPL-2.1+, \
@@ -87,8 +87,12 @@ SYSTEMD_CONF_OPTS += \
 	-Dtelinit-path= \
 	-Dtests=false \
 	-Dtmpfiles=true \
-	-Dumount-path=/usr/bin/umount \
-	-Dutmp=false
+	-Dumount-path=/usr/bin/umount
+
+SYSTEMD_CFLAGS = $(TARGET_CFLAGS)
+ifeq ($(BR2_OPTIMIZE_FAST),y)
+SYSTEMD_CFLAGS += -O3
+endif
 
 ifeq ($(BR2_nios2),y)
 # Nios2 ld emits warnings, make warnings not to be treated as errors
@@ -324,6 +328,12 @@ ifeq ($(BR2_PACKAGE_SYSTEMD_BINFMT),y)
 SYSTEMD_CONF_OPTS += -Dbinfmt=true
 else
 SYSTEMD_CONF_OPTS += -Dbinfmt=false
+endif
+
+ifeq ($(BR2_PACKAGE_SYSTEMD_UTMP),y)
+SYSTEMD_CONF_OPTS += -Dutmp=true
+else
+SYSTEMD_CONF_OPTS += -Dutmp=false
 endif
 
 ifeq ($(BR2_PACKAGE_SYSTEMD_VCONSOLE),y)
@@ -738,12 +748,6 @@ define SYSTEMD_RM_CATALOG_UPDATE_SERVICE
 		$(TARGET_DIR)/usr/lib/systemd/system/*/systemd-journal-catalog-update.service
 endef
 SYSTEMD_ROOTFS_PRE_CMD_HOOKS += SYSTEMD_RM_CATALOG_UPDATE_SERVICE
-
-define SYSTEMD_CREATE_TMPFILES_HOOK
-	HOST_SYSTEMD_TMPFILES=$(HOST_DIR)/bin/systemd-tmpfiles \
-		$(SYSTEMD_PKGDIR)/fakeroot_tmpfiles.sh $(TARGET_DIR)
-endef
-SYSTEMD_ROOTFS_PRE_CMD_HOOKS += SYSTEMD_CREATE_TMPFILES_HOOK
 
 define SYSTEMD_PRESET_ALL
 	$(HOST_DIR)/bin/systemctl --root=$(TARGET_DIR) preset-all
