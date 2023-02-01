@@ -14,7 +14,7 @@ jobs:
         run: |
           sudo -E apt-get -qq update
           sudo -E apt-get install sed make binutils build-essential gcc g++ bash patch \
-          gzip bzip2 perl tar cpio unzip rsync file bc wget python cvs git \
+          gzip bzip2 perl tar cpio unzip rsync file bc wget python3 cvs git \
           mercurial subversion
 
       - name: Checkout Buildroot sources
